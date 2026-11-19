@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict');
+const E=require('../js/simulation.js');
+const s=E.create(123);s.duration=1000;s.staff[0].roles=['cashier'];E.openShift(s);s.spawnTimer=9999;
+const c=E.spawnCustomer(s,{species:'minotaur',name:'Mino proof customer'});
+const initialStock=s.objects.find(o=>o.id==='shelf-1').stock,initialCash=s.cash;
+for(let n=0;n<400&&s.customers.includes(c);n++)E.tick(s,.25);
+assert.equal(s.customers.length,0);assert.equal(s.served,1);assert.equal(s.objects.find(o=>o.id==='shelf-1').stock,initialStock-1);
+assert.equal(s.cash,initialCash+E.price(s,E.product('maze-pretzel')));assert.equal(s.ledger.filter(e=>e.type==='sale').length,1);
+assert.equal(c.x,s.entrance.x);assert.equal(c.y,s.entrance.y);
+console.log(JSON.stringify({gate:1,passed:true,initialStock,finalStock:s.objects.find(o=>o.id==='shelf-1').stock,initialCash,finalCash:s.cash,trace:s.events},null,2));
